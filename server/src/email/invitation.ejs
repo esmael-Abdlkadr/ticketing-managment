@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: #f9fafb;
+        margin: 0;
+        padding: 0;
+        color: #111827;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .header svg {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+      }
+
+      .header h1 {
+        font-size: 26px;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      /* Content */
+      .content {
+        background-color: white;
+        padding: 35px;
+      }
+
+      .content h2 {
+        font-size: 22px;
+        margin-top: 0;
+        color: #0369a1;
+      }
+
+      .content p {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #374151;
+      }
+
+      .role-badge {
+        display: inline-block;
+        background-color: #e0f2fe;
+        color: #0369a1;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 20px;
+      }
+
+      .btn-container {
+        text-align: center;
+        margin: 30px 0;
+      }
+
+      .btn {
+        display: inline-block;
+        background-color: #0284c7;
+        color: white;
+        text-decoration: none;
+        padding: 14px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        font-size: 16px;
+      }
+
+      .btn:hover {
+        background-color: #0369a1;
+      }
+
+      .info-box {
+        background-color: #f1f5f9;
+        border-left: 4px solid #0284c7;
+        padding: 15px 20px;
+        margin: 25px 0;
+        border-radius: 6px;
+      }
+
+      .info-box p {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      /* Footer */
+      .footer {
+        background-color: #f8fafc;
+        padding: 25px;
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .logo {
+        font-weight: 700;
+        color: #0284c7;
+        margin-bottom: 10px;
+        display: block;
+        font-size: 16px;
+      }
+
+      .social-links {
+        margin: 15px 0;
+      }
+
+      .social-links a {
+        display: inline-block;
+        margin: 0 8px;
+        color: #64748b;
+      }
+    </style>
+    <title>Join SupportSphere - Complete Your Registration</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M18 2L22 6V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V6C2 4.89543 2.89543 4 4 4H10L12 2H18Z"
+            fill="white"
+          />
+          <path
+            d="M9 13H15M12 10V16"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <h1>SupportSphere</h1>
+      </div>
+      <div class="content">
+        <h2>Welcome to SupportSphere, <%= user.name %>!</h2>
+
+        <p>You've been invited to join SupportSphere as a:</p>
+        <div class="role-badge"><%= user.role %></div>
+
+        <p>
+          SupportSphere is our centralized support platform that helps our team
+          provide excellent customer service and efficiently manage support
+          requests.
+        </p>
+
+        <p>To get started, you'll need to set up your account:</p>
+
+        <div class="btn-container">
+          <a href="<%= inviteUrl %>" class="btn">Complete Registration</a>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Note:</strong> This invitation link will expire in 7 days.
+            If you don't complete your registration by then, you'll need to
+            request a new invitation.
+          </p>
+        </div>
+
+        <p>
+          If you have any questions about this invitation, please contact your
+          administrator.
+        </p>
+      </div>
+      <div class="footer">
+        <span class="logo">SupportSphere</span>
+        <p>Streamlining support ticket management</p>
+        <div class="social-links">
+          <a href="#">Twitter</a> • <a href="#">LinkedIn</a> •
+          <a href="#">Facebook</a>
+        </div>
+        <p>
+          © <%= new Date().getFullYear() %> SupportSphere. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

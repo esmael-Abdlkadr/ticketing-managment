@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background-color: #f9fafb;
+        margin: 0;
+        padding: 0;
+        color: #111827;
+        line-height: 1.5;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+        color: white;
+        text-align: center;
+        padding: 30px 20px;
+      }
+
+      .header svg {
+        width: 60px;
+        height: 60px;
+        margin-bottom: 15px;
+      }
+
+      .header h1 {
+        font-size: 26px;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+      }
+
+      /* Content */
+      .content {
+        background-color: white;
+        padding: 35px;
+      }
+
+      .content h2 {
+        font-size: 22px;
+        margin-top: 0;
+        color: #0369a1;
+      }
+
+      .content p {
+        font-size: 16px;
+        margin-bottom: 20px;
+        color: #374151;
+      }
+
+      /* OTP Container */
+      .otp-container {
+        margin: 30px 0;
+        text-align: center;
+      }
+
+      .otp-code {
+        background-color: #f3f4f6;
+        border: 2px dashed #d1d5db;
+        border-radius: 8px;
+        padding: 15px 25px;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 5px;
+        color: #0284c7;
+        display: inline-block;
+      }
+
+      .expiry-note {
+        margin-top: 15px;
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .info-box {
+        background-color: #f1f5f9;
+        border-left: 4px solid #0284c7;
+        padding: 15px 20px;
+        margin: 25px 0;
+        border-radius: 6px;
+      }
+
+      .info-box p {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .btn-container {
+        text-align: center;
+        margin: 30px 0 10px;
+      }
+
+      .btn {
+        display: inline-block;
+        background-color: #0284c7;
+        color: white;
+        text-decoration: none;
+        padding: 14px 24px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        font-size: 16px;
+      }
+
+      .btn:hover {
+        background-color: #0369a1;
+      }
+
+      /* Footer */
+      .footer {
+        background-color: #f8fafc;
+        padding: 25px;
+        text-align: center;
+        color: #64748b;
+        font-size: 14px;
+        border-top: 1px solid #e2e8f0;
+      }
+
+      .logo {
+        font-weight: 700;
+        color: #0284c7;
+        margin-bottom: 10px;
+        display: block;
+        font-size: 16px;
+      }
+
+      .social-links {
+        margin: 15px 0;
+      }
+
+      .social-links a {
+        display: inline-block;
+        margin: 0 8px;
+        color: #64748b;
+      }
+    </style>
+    <title>Verify Your Email - SupportSphere</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M18 2L22 6V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V6C2 4.89543 2.89543 4 4 4H10L12 2H18Z"
+            fill="white"
+          />
+          <path
+            d="M9 13H15M12 10V16"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <h1>SupportSphere</h1>
+      </div>
+      <div class="content">
+        <h2>Verify Your Email Address</h2>
+
+        <p>Hi <%= user.name %>,</p>
+
+        <p>
+          Welcome to SupportSphere! To get started, please verify your email
+          address by entering the following verification code:
+        </p>
+
+        <div class="otp-container">
+          <div class="otp-code"><%= otp %></div>
+          <p class="expiry-note">This code will expire in 10 minutes</p>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Important:</strong> If you did not request this verification
+            code, please ignore this email or contact support if you believe
+            this is an error.
+          </p>
+        </div>
+
+        <p>
+          After verifying your email, you'll have full access to our support
+          platform where you can create and track support tickets.
+        </p>
+
+        <div class="btn-container">
+          <a href="<%= process.env.FRONTEND_URL || '#' %>/verify" class="btn"
+            >Go to Verification Page</a
+          >
+        </div>
+      </div>
+      <div class="footer">
+        <span class="logo">SupportSphere</span>
+        <p>Streamlining support ticket management</p>
+        <div class="social-links">
+          <a href="#">Twitter</a> • <a href="#">LinkedIn</a> •
+          <a href="#">Facebook</a>
+        </div>
+        <p>
+          © <%= new Date().getFullYear() %> SupportSphere. All rights reserved.
+        </p>
+        <p>Generated on: 2025-03-01 23:29:11</p>
+      </div>
+    </div>
+  </body>
+</html>
