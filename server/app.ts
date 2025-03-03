@@ -9,6 +9,7 @@ import { errorMiddleware } from "./src/utils/globalErrorHandler";
 import authRouter from "./src/router/authRoute";
 import userRouter from "./src/router/userRoute";
 import ticketRouter from "./src/router/ticket";
+import  healthRouter from "./src/router/healthRoute"
 import swaggerSpec from "./swaggerOption";
 const app = express();
 app.use(
@@ -48,6 +49,7 @@ app.get("/swagger.json", (req, res) => {
 app.use(compression());
 // initEventStatusCron()
 // routes.
+app.use('/api', healthRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/tickets", ticketRouter);

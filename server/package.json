@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc && pnpm sentry:sourcemaps",
-    "sentry-wizard": "sentry-wizard -i sourcemaps --saas",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org anonshare --project anonshare-api ./dist && sentry-cli sourcemaps upload --org anonshare --project anonshare-api ./dist"
+  {
+    "scripts": {
+      "dev": "ts-node-dev --respawn --transpile-only server.ts",
+      "start": "node dist/server.js",
+      "build": "tsc",
+      "build:prod": "tsc && (pnpm sentry:sourcemaps || echo 'Skipping Sentry sourcemaps')",
+      "sentry-wizard": "sentry-wizard -i sourcemaps --saas",
+      "sentry:sourcemaps": "npx sentry-cli sourcemaps inject --org anonshare --project anonshare-api ./dist && npx sentry-cli sourcemaps upload --org anonshare --project anonshare-api ./dist"
+    }
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,12 @@
+{
+  "build": {
+    "builder": "nixpacks",
+    "buildCommand": "pnpm install && pnpm run build:prod"
+  },
+  "deploy": {
+    "startCommand": "pnpm start",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 60,
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
