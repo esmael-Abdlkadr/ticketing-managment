@@ -77,13 +77,19 @@ export interface IUser extends Document {
   isOtpValid: () => boolean;
 }
 
-export interface IComment {
-  _id?: Types.ObjectId;
-  text: string;
-  createdBy: Types.ObjectId | IUser;
-  createdAt: Date;
-}
+// Add to your existing types file...
 
+export interface IComment {
+  _id: string;
+  text: string;
+  createdBy: string | IUser;
+  ticketId: string | ITicket;
+  isInternal: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  parentComment?: string | IComment | null;
+  replies?: Array<string | IComment>;
+}
 export interface ITicket extends Document {
   title: string;
   description: string;

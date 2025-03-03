@@ -11,6 +11,8 @@ const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
 const Tickets = lazy(() => import("./pages/Tickets"));
 const Users = lazy(() => import("./pages/Users"));
+const CompleteRegistration = lazy(() => import("./pages/CompleetRegistration"));
+const TicketAnswer= lazy(() => import("./pages/TicketAnswer"));
 
 function App() {
   return (
@@ -20,11 +22,13 @@ function App() {
           <Suspense fallback={<Spinner />}>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/complete-registration" element={<CompleteRegistration />} />
 
               <Route path={"/"} element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="/tickets" element={<Tickets />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/tickets/answer/:id" element={<TicketAnswer />} />
 
                 <Route path="*" element={<NotFound />} />
               </Route>

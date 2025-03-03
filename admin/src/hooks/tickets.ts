@@ -4,7 +4,7 @@ import showToast from "../utils/toastHelper";
 import { useQueryClient } from "@tanstack/react-query";
 import { AppError } from "../utils/errors";
 import { ErrorType } from "../services/api/types";
-import { TicketQueryParams } from "../services/ticket/type";
+import { AddCommentData, TicketQueryParams } from "../services/ticket/type";
 
 export const useGetTickets = (params?: TicketQueryParams) => {
   return useTrackedQuery(["tickets", params], () =>
@@ -135,7 +135,7 @@ export const useDeleteTicket = (id: string) => {
 export const useAddComment = (ticketId: string) => {
   const queryClient = useQueryClient();
   const { mutateAsync, isPending, isError, isSuccess } = useTrackedMutation(
-    (data) => TicketService.addComment(ticketId, data),
+    (data: AddCommentData) => TicketService.addComment(ticketId, data),
     {
       mutationKey: ["add-comment", ticketId],
       onSuccess: (data) => {

@@ -35,6 +35,7 @@ const updateTicketSchema = z.object({
 
 const commentSchema = z.object({
   text: z.string().min(1, "Comment text is required"),
+  parentCommentId: z.string().optional(),
 });
 
 export const createTicket = asyncHandler(
@@ -82,7 +83,7 @@ export const createTicket = asyncHandler(
       email: req.user.email,
       subject: "Your Support Ticket Has Been Created",
       template: "ticket-created",
-      date: {
+      data: {
         user: {
           firstName: req.user.firstName,
           lastName: req.user.lastName,
@@ -330,7 +331,7 @@ export const addComment = asyncHandler(
       return next(new HttpError(errorMessages, 400));
     }
 
-    const { text } = validationResult.data;
+    const { text, parentCommentId } = validationResult.data;
     // Check if comment is marked as internal (visible only to staff)
     const isInternal =
       req.body.isInternal === true &&
@@ -356,16 +357,40 @@ export const addComment = asyncHandler(
     if (!req.user?._id) {
       return next(new HttpError("User not authenticated", 401));
     }
+    
+    // Handle parent comment if this is a reply
+    let parentComment = null;
+    if (parentCommentId) {
+      parentComment = await Comment.findById(parentCommentId);
+      
+      if (!parentComment) {
+        return next(new HttpError("Parent comment not found", 404));
+      }
+      
+      // Verify the parent comment belongs to this ticket
+      if (parentComment.ticketId !== ticketDoc._id) {
+        return next(
+          new HttpError("Parent comment does not belong to this ticket", 400)
+        );
+      }
+    }
 
     // Create new comment
     const comment = new Comment({
       text,
       createdBy: req.user._id,
       ticketId: ticketDoc._id,
-      isInternal, // Store whether this is an internal note
+      isInternal,
+      parentComment: parentCommentId || null,
     });
 
     const savedComment = await comment.save();
+
+    // If this is a reply, update the parent comment's replies array
+    if (parentComment) {
+      parentComment.replies = [...(parentComment.replies || []), savedComment._id];
+      await parentComment.save();
+    }
 
     // Add comment to ticket's comments array
     ticketDoc.comments.push(savedComment);
@@ -384,19 +409,39 @@ export const addComment = asyncHandler(
       .populate("createdBy", "firstName lastName email")
       .populate({
         path: "comments",
-        populate: {
-          path: "createdBy",
-          select: "firstName lastName email role",
-        },
+        populate: [
+          {
+            path: "createdBy",
+            select: "firstName lastName email role",
+          },
+          {
+            path: "replies",
+            populate: {
+              path: "createdBy",
+              select: "firstName lastName email role",
+            },
+          },
+        ],
       });
 
-    // Send email notification if appropriate conditions are met
-    if (
-      !isInternal &&
-      ticketCreator &&
-      ticketCreator.email &&
-      ticketDoc.createdBy.toString() !== req.user._id.toString()
-    ) {
+    // Determine notification recipient (ticket creator or comment author)
+    let notificationRecipient;
+    
+    if (parentComment) {
+      // If replying to a comment, notify the author of that comment
+      const parentCommentUser = await User.findById(parentComment.createdBy);
+      
+      // Don't notify yourself
+      if (parentCommentUser && parentCommentUser._id !== req.user._id) {
+        notificationRecipient = parentCommentUser;
+      }
+    } else if (ticketCreator && ticketCreator._id !== req.user._id) {
+      // For top-level comments, notify the ticket creator (if it's not you)
+      notificationRecipient = ticketCreator;
+    }
+
+    // Send email notification
+    if (!isInternal && notificationRecipient && notificationRecipient.email) {
       // Format date for email
       const formattedDate = new Date().toLocaleString("en-US", {
         year: "numeric",
@@ -410,14 +455,16 @@ export const addComment = asyncHandler(
 
       try {
         await sendEmail({
-          email: ticketCreator.email,
-          subject: "New Comment on Your Support Ticket",
-          template: "comment-added",
+          email: notificationRecipient.email,
+          subject: parentComment 
+            ? "New Reply to Your Comment" 
+            : "New Comment on Your Support Ticket",
+          template: parentComment ? "comment-reply-added" : "comment-added",
           date: {
             user: {
-              firstName: ticketCreator.firstName,
-              lastName: ticketCreator.lastName,
-              email: ticketCreator.email,
+              firstName: notificationRecipient.firstName,
+              lastName: notificationRecipient.lastName,
+              email: notificationRecipient.email,
             },
             ticket: {
               id: ticketDoc._id,
@@ -433,18 +480,16 @@ export const addComment = asyncHandler(
           },
         });
 
-        console.log(
-          `Comment notification email sent to ${ticketCreator.email}`
-        );
+        console.log(`Notification email sent to ${notificationRecipient.email}`);
       } catch (error) {
         // Log error but don't fail the request
-        console.error("Error sending comment notification email:", error);
+        console.error("Error sending notification email:", error);
       }
     }
 
     res.status(201).json({
       status: "success",
-      message: "Comment added successfully",
+      message: parentComment ? "Reply added successfully" : "Comment added successfully",
       data: updatedTicket,
     });
   }

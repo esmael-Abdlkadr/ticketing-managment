@@ -41,6 +41,14 @@ const userSchema = new Schema<IUser>(
       type: String,
       select: false,
     },
+    inviteToken:{
+      type: String,
+      select: false,
+    },
+    inviteExpires:{
+      type: Date,
+      select: false,
+    },
     otpExpires: {
       type: Date,
       select: false,

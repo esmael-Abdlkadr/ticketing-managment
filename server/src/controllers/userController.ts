@@ -96,7 +96,7 @@ export const inviteUser = asyncHandler(
       return next(new HttpError(errorMessages, 400));
     }
 
-    const { firstName, lastName, email, role, departmentId } =
+    const { firstName, lastName, email, role } =
       parsedResult.data;
 
     try {
@@ -108,14 +108,14 @@ export const inviteUser = asyncHandler(
 
       // Generate invite token
       const inviteToken = crypto.randomBytes(32).toString("hex");
-      const inviteExpires = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+      const inviteExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       // Create user with pending status
       const user = await User.create({
         firstName,
         lastName,
         email,
         role,
-        departmentId,
+        // departmentId,
         inviteToken,
         inviteExpires,
         emailVerified: false,
@@ -125,6 +125,7 @@ export const inviteUser = asyncHandler(
 
       // Send invitation email
       const inviteUrl = `${process.env.FRONTEND_URL}/complete-registration?token=${inviteToken}`;
+      console.log("Invitation URL:", inviteUrl);
 
       await sendEmail({
         email: user.email,
@@ -155,21 +156,26 @@ export const inviteUser = asyncHandler(
 export const completeRegistration = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token, password } = req.body;
-
+  
     if (!token || !password) {
       return next(new HttpError("Token and password are required", 400));
     }
 
-    // Find user with this invite token
-    const user = await User.findOne({
-      inviteToken: token,
-      inviteExpires: { $gt: new Date() },
-    });
-
+    // MODIFIED: Include select:false fields explicitly with + prefix
+    const user = await User.findOne({ inviteToken: token })
+      .select('+inviteToken +inviteExpires');
+    
     if (!user) {
-      return next(new HttpError("Invalid or expired invitation token", 400));
+      console.log("No user found with the provided token");
+      return next(new HttpError("Invalid invitation token", 400));
+    }
+    
+    // If user exists, check if token is expired
+    if (!user.inviteExpires || user.inviteExpires < new Date()) {
+      return next(new HttpError("Invitation token has expired", 400));
     }
 
+    
     // Set user's password and activate account
     user.password = password;
     user.emailVerified = true;

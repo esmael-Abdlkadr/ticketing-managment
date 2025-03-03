@@ -9,12 +9,8 @@ export const generateAccessToken = (payload: TokenPayload): string => {
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
-
-  const options: SignOptions = {
-    expiresIn:
-      (process.env.JWT_EXPIRES_IN as SignOptions["expiresIn"]) || "15m",
-  };
-
+  const options: SignOptions = {};
+  
   return jwt.sign(payload as JwtPayload, secret as Secret, options);
 };
 

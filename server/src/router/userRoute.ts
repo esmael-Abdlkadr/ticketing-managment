@@ -8,8 +8,10 @@ import {
   assignRoleToUser,
   getOrganizerUsers,
   inviteUser,
+  completeRegistration,
 } from "../controllers/userController";
 import { protect, restrictTo } from "../controllers/authController";
+router.post("/complete-registration",completeRegistration)
 router.use(protect);
 router.get("/me", myInfo);
 router.patch("/update-me", updateMe);
@@ -125,10 +127,10 @@ export default router;
 
 /**
  * @swagger
- * /api/v1/users/create-event-user:
+ * /api/v1/users/invite-user:
  *   post:
  *     tags: [User]
- *     summary: Create a new event user
+ *     summary: Invite a new user (admin only)
  *     requestBody:
  *       required: true
  *       content:
@@ -138,25 +140,23 @@ export default router;
  *             properties:
  *               firstName:
  *                 type: string
- *                 example: John
  *               lastName:
  *                 type: string
- *                 example: Doe
- *               eventId:
+ *               email:
  *                 type: string
- *                 example: 60d0fe4f5311236168a109ca
  *               role:
  *                 type: string
- *                 example: attendee
+ *               departmentId:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Event user created successfully
+ *         description: Invitation sent successfully
  *       400:
  *         description: Invalid request data
  *       403:
- *         description: Not authorized to create event users
+ *         description: Not authorized to invite users
  *       500:
- *         description: Failed to create event user account
+ *         description: Failed to send user invitation
  */
 
 /**

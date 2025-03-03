@@ -9,10 +9,8 @@ import { errorMiddleware } from "./src/utils/globalErrorHandler";
 import authRouter from "./src/router/authRoute";
 import userRouter from "./src/router/userRoute";
 import ticketRouter from "./src/router/ticket";
-
 import swaggerSpec from "./swaggerOption";
 const app = express();
-
 app.use(
   helmet({
     contentSecurityPolicy: {

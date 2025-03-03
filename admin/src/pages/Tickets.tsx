@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaFilter,
@@ -10,6 +10,7 @@ import {
   FaUserPlus,
   FaExclamationCircle,
   FaDownload,
+  FaCommentDots,
 } from "react-icons/fa";
 
 import {
@@ -45,13 +46,13 @@ const SORT_OPTIONS = [
 
 const TicketsPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // System info with timestamp and username
   const [systemInfo, setSystemInfo] = useState({
     timestamp: "",
     username: user?.firstName
-      ? `${user.firstName} ${user.lastName}`
-      : "esmael-Abdlkadr",
+    
   });
 
   // State for selected ticket
@@ -99,37 +100,42 @@ const TicketsPage: React.FC = () => {
     refetch,
   } = useGetTickets(queryParams);
 
-  // Fetch selected ticket details when needed
+
   const {
     data: ticketDetailResponse,
     isLoading: isLoadingTicketDetail,
     refetch: refetchTicket,
   } = useGetTicketById(selectedTicketId || "");
-  console.log("ticketdetail", ticketDetailResponse);
 
-  // Update ticket mutation
+
+
   const { updateTicket, updateTicketLoading } = useUpdateTicket(
     selectedTicketId || ""
   );
 
-  // Delete ticket mutation
+
   const { deleteTicket, deleteTicketLoading } = useDeleteTicket(
     selectedTicketId || ""
   );
 
-  // Extract tickets data safely
+ 
   const tickets = ticketsResponse || [];
   const pagination = ticketsResponse?.pagination || {
     page: 1,
     totalPages: 1,
     totalResults: 0,
   };
-  const selectedTicket = ticketDetailResponse?.data;
+  const selectedTicket = ticketDetailResponse;
 
   // Handle filter changes
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setQueryParams((prev) => ({ ...prev, page: 1 })); // Reset to first page when filtering
+  };
+  const handleAnswer = () => {
+    if (selectedTicketId) {
+      navigate(`/tickets/answer/${selectedTicketId}`);
+    }
   };
 
   // Handle search input
@@ -175,7 +181,13 @@ const TicketsPage: React.FC = () => {
     }
   };
 
-  const handleUpdateStatus = async (data) => {
+  interface UpdateStatusData {
+    status: string;
+    priority?: string;
+    category?: string;
+  }
+
+  const handleUpdateStatus = async (data: UpdateStatusData) => {
     if (selectedTicketId) {
       await updateTicket(data);
       setStatusModalOpen(false);
@@ -191,7 +203,7 @@ const TicketsPage: React.FC = () => {
 
   const handleDeleteTicket = async () => {
     if (selectedTicketId) {
-      await deleteTicket();
+      await deleteTicket(selectedTicketId);
       setDeleteModalOpen(false);
       setSelectedTicketId(null);
       refetch();
@@ -424,6 +436,17 @@ const TicketsPage: React.FC = () => {
           >
             <FaEye className="mr-1" /> View Details
           </button>
+          <button
+      onClick={handleAnswer}
+      disabled={!selectedTicketId}
+      className={`px-3 py-1.5 rounded-md flex items-center ${
+        selectedTicketId
+          ? "bg-green-600 text-white hover:bg-green-700"
+          : "bg-gray-200 text-gray-500 cursor-not-allowed"
+      }`}
+    >
+      <FaCommentDots className="mr-1" /> Answer
+    </button>
 
           <button
             onClick={handleOpenStatusUpdate}

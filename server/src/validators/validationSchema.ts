@@ -39,7 +39,7 @@ export const updateTicketSchema = z.object({
   category: z.nativeEnum(TicketCategory).optional(),
 });
 
-// User creation schema (for admins creating users)
+
 export const createUserSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
@@ -47,10 +47,18 @@ export const createUserSchema = z.object({
   role: z.nativeEnum(UserRole),
   eventId: z.string().optional(),
 });
+// User creation schema (for admins creating users)
 export const createUserInviteSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
   role: z.nativeEnum(UserRole),
   departmentId: z.string().optional(),
+});
+
+
+export const commentSchema = z.object({
+  text: z.string().min(1, "Comment text is required"),
+  isInternal: z.boolean().optional(),
+  parentCommentId: z.string().optional(),
 });
