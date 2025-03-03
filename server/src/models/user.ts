@@ -41,11 +41,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       select: false,
     },
-    inviteToken:{
+    inviteToken: {
       type: String,
       select: false,
     },
-    inviteExpires:{
+    inviteExpires: {
       type: Date,
       select: false,
     },
@@ -77,7 +77,9 @@ const userSchema = new Schema<IUser>(
 userSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) return next();
   try {
-    this.password = await hashPassword(this.password);
+    if (this.password) {
+      this.password = await hashPassword(this.password);
+    }
     next();
   } catch (error) {
     next(error as Error);

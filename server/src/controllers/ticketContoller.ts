@@ -83,7 +83,7 @@ export const createTicket = asyncHandler(
       email: req.user.email,
       subject: "Your Support Ticket Has Been Created",
       template: "ticket-created",
-      data: {
+      date: {
         user: {
           firstName: req.user.firstName,
           lastName: req.user.lastName,
@@ -198,10 +198,23 @@ export const getTicketById = asyncHandler(
       .populate("createdBy", "firstName lastName email")
       .populate({
         path: "comments",
-        populate: {
-          path: "createdBy",
-          select: "firstName lastName email",
-        },
+        populate: [
+          {
+            path: "createdBy",
+            select: "firstName lastName email role",
+          },
+          {
+            path: "parentComment",
+            select: "_id text createdAt",
+          },
+          {
+            path: "replies",
+            populate: {
+              path: "createdBy",
+              select: "firstName lastName email role",
+            },
+          },
+        ],
       });
 
     if (!ticket) {
@@ -209,13 +222,38 @@ export const getTicketById = asyncHandler(
     }
 
     // Check if user has permission to view this ticket
+    const isStaff = ["admin", "manager", "support_agent"].includes(
+      req.user?.role || ""
+    );
+
+    // Get creator ID with proper type checking
+    let creatorId: string;
+
+    // Check if createdBy is populated (object) or just an ID
     if (
-      req.user &&
-      req.user.role !== "admin" &&
-      req.user.role !== "manager" &&
-      req.user.role !== "support_agent" &&
-      ticket.createdBy._id !== req.user._id
+      ticket.createdBy &&
+      typeof ticket.createdBy === "object" &&
+      "_id" in ticket.createdBy
     ) {
+      // It's a populated user object
+      creatorId = ticket.createdBy._id.toString();
+    } else if (ticket.createdBy) {
+      // It's just the ObjectId
+      creatorId = (ticket.createdBy as unknown as string).toString();
+    } else {
+      // Should never happen, but just in case
+      return next(new HttpError("Invalid ticket creator data", 500));
+    }
+
+    // Current user ID as string with proper type checking
+    if (!req.user || !req.user._id) {
+      return next(new HttpError("User not authenticated", 401));
+    }
+
+    const currentUserId = req.user._id.toString();
+
+    // Allow access if user is staff or ticket creator
+    if (!isStaff && creatorId !== currentUserId) {
       return next(new HttpError("Not authorized to access this ticket", 403));
     }
 
@@ -345,9 +383,15 @@ export const addComment = asyncHandler(
     }
 
     // Check if user can comment on this ticket - use toString() for ObjectId comparison
+    const ticketCreatorId =
+      typeof ticketDoc.createdBy === "object" && ticketDoc.createdBy !== null
+        ? ticketDoc.createdBy._id
+        : ticketDoc.createdBy;
+
+    // Check if user can comment on this ticket
     if (
       req.user?.role === UserRole.CUSTOMER &&
-      ticketDoc.createdBy !== req.user._id
+      ticketCreatorId.toString() !== req.user._id.toString()
     ) {
       return next(
         new HttpError("Not authorized to comment on this ticket", 403)
@@ -357,18 +401,18 @@ export const addComment = asyncHandler(
     if (!req.user?._id) {
       return next(new HttpError("User not authenticated", 401));
     }
-    
+
     // Handle parent comment if this is a reply
     let parentComment = null;
     if (parentCommentId) {
       parentComment = await Comment.findById(parentCommentId);
-      
+
       if (!parentComment) {
         return next(new HttpError("Parent comment not found", 404));
       }
-      
+
       // Verify the parent comment belongs to this ticket
-      if (parentComment.ticketId !== ticketDoc._id) {
+      if (parentComment.ticketId.toString() !== ticketDoc._id.toString()) {
         return next(
           new HttpError("Parent comment does not belong to this ticket", 400)
         );
@@ -388,7 +432,10 @@ export const addComment = asyncHandler(
 
     // If this is a reply, update the parent comment's replies array
     if (parentComment) {
-      parentComment.replies = [...(parentComment.replies || []), savedComment._id];
+      parentComment.replies = [
+        ...(parentComment.replies || []),
+        savedComment._id.toString(),
+      ];
       await parentComment.save();
     }
 
@@ -426,11 +473,11 @@ export const addComment = asyncHandler(
 
     // Determine notification recipient (ticket creator or comment author)
     let notificationRecipient;
-    
+
     if (parentComment) {
       // If replying to a comment, notify the author of that comment
       const parentCommentUser = await User.findById(parentComment.createdBy);
-      
+
       // Don't notify yourself
       if (parentCommentUser && parentCommentUser._id !== req.user._id) {
         notificationRecipient = parentCommentUser;
@@ -456,8 +503,8 @@ export const addComment = asyncHandler(
       try {
         await sendEmail({
           email: notificationRecipient.email,
-          subject: parentComment 
-            ? "New Reply to Your Comment" 
+          subject: parentComment
+            ? "New Reply to Your Comment"
             : "New Comment on Your Support Ticket",
           template: parentComment ? "comment-reply-added" : "comment-added",
           date: {
@@ -480,7 +527,9 @@ export const addComment = asyncHandler(
           },
         });
 
-        console.log(`Notification email sent to ${notificationRecipient.email}`);
+        console.log(
+          `Notification email sent to ${notificationRecipient.email}`
+        );
       } catch (error) {
         // Log error but don't fail the request
         console.error("Error sending notification email:", error);
@@ -489,7 +538,9 @@ export const addComment = asyncHandler(
 
     res.status(201).json({
       status: "success",
-      message: parentComment ? "Reply added successfully" : "Comment added successfully",
+      message: parentComment
+        ? "Reply added successfully"
+        : "Comment added successfully",
       data: updatedTicket,
     });
   }

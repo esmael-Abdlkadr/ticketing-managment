@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  FaPlus, 
-  FaTrash, 
-  FaPencilAlt, 
-  FaComment, 
-  FaSearch, 
-  FaExclamationCircle, 
+import {
+  FaPlus,
+  FaTrash,
+  FaPencilAlt,
+  FaComment,
+  FaSearch,
+  FaExclamationCircle,
   FaSortAmountDown,
   FaSortAmountUp,
-  FaSpinner
+  FaSpinner,
 } from "react-icons/fa";
-import { useGetTickets, useUpdateTicket, useDeleteTicket, useAddComment } from "../hooks/tickets"
+import {
+  useGetTickets,
+  useUpdateTicket,
+  useDeleteTicket,
+  useAddComment,
+} from "../hooks/tickets";
 import SystemInfo from "../components/common/SystemInfo";
 import { Ticket } from "../services/ticket/type";
 
@@ -19,7 +24,6 @@ type SortField = "createdAt" | "updatedAt" | "priority" | "status";
 type SortDirection = "asc" | "desc";
 
 const TicketsListPage: React.FC = () => {
-
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
@@ -38,23 +42,25 @@ const TicketsListPage: React.FC = () => {
   };
 
   // Fetch tickets using the hook
-  const { 
-    data: ticketsData, 
-    isLoading, 
-    error 
-  } = useGetTickets(queryParams);
+  const { data: ticketsData, isLoading, error } = useGetTickets(queryParams);
 
   const tickets: Array<Ticket> = Array.isArray(ticketsData) ? ticketsData : [];
 
   // Get selected ticket
-  const selectedTicket = selectedTicketId 
-    ? tickets.find(ticket => ticket._id === selectedTicketId) 
+  const selectedTicket = selectedTicketId
+    ? tickets.find((ticket) => ticket._id === selectedTicketId)
     : null;
 
   // Hooks for operations
-  const { updateTicket, updateTicketLoading } = useUpdateTicket(selectedTicketId || '');
-  const { deleteTicket, deleteTicketLoading } = useDeleteTicket(selectedTicketId || '');
-  const { addComment, addCommentLoading } = useAddComment(selectedTicketId || '');
+  const { updateTicket, updateTicketLoading } = useUpdateTicket(
+    selectedTicketId || ""
+  );
+  const { deleteTicket, deleteTicketLoading } = useDeleteTicket(
+    selectedTicketId || ""
+  );
+  const { addComment, addCommentLoading } = useAddComment(
+    selectedTicketId || ""
+  );
 
   // Handle sort toggle
   const toggleSort = (field: SortField) => {
@@ -68,12 +74,12 @@ const TicketsListPage: React.FC = () => {
 
   // Handle ticket edit
   const handleEdit = (ticketId: string) => {
-    const ticket = tickets.find(t => t._id === ticketId);
+    const ticket = tickets.find((t) => t._id === ticketId);
     if (ticket) {
       setSelectedTicketId(ticketId);
       setEditValues({
         title: ticket.title,
-        description: ticket.description
+        description: ticket.description,
       });
       setIsEditModalOpen(true);
     }
@@ -88,7 +94,7 @@ const TicketsListPage: React.FC = () => {
   // Delete the ticket
   const handleDelete = async () => {
     if (!selectedTicketId) return;
-    
+
     try {
       await deleteTicket(selectedTicketId);
       setIsDeleteModalOpen(false);
@@ -108,11 +114,11 @@ const TicketsListPage: React.FC = () => {
   // Submit updated ticket
   const handleUpdateTicket = async () => {
     if (!selectedTicketId) return;
-    
+
     try {
       await updateTicket({
         title: editValues.title,
-        description: editValues.description
+        description: editValues.description,
       });
       setIsEditModalOpen(false);
     } catch (err) {
@@ -123,10 +129,10 @@ const TicketsListPage: React.FC = () => {
   // Add comment to ticket
   const handleAddComment = async () => {
     if (!selectedTicketId || !commentText.trim()) return;
-    
+
     try {
       await addComment({
-        text: commentText
+        text: commentText,
       });
       setIsCommentModalOpen(false);
     } catch (err) {
@@ -137,7 +143,7 @@ const TicketsListPage: React.FC = () => {
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
   // Get status color class
@@ -171,11 +177,11 @@ const TicketsListPage: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <SystemInfo />
-      
+
       {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between my-6">
         <h1 className="text-2xl font-bold text-gray-900">My Tickets</h1>
-        
+
         <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-3">
           <div className="relative">
             <input
@@ -187,7 +193,7 @@ const TicketsListPage: React.FC = () => {
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           </div>
-          
+
           <Link
             to="/tickets/new"
             className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors"
@@ -197,7 +203,7 @@ const TicketsListPage: React.FC = () => {
           </Link>
         </div>
       </div>
-      
+
       {/* Error display */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-6 flex items-center">
@@ -205,7 +211,7 @@ const TicketsListPage: React.FC = () => {
           <span>Failed to load tickets. Please try again later.</span>
         </div>
       )}
-      
+
       {/* Tickets list */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
         {isLoading ? (
@@ -229,9 +235,13 @@ const TicketsListPage: React.FC = () => {
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">No tickets found</h3>
+            <h3 className="mt-2 text-lg font-medium text-gray-900">
+              No tickets found
+            </h3>
             <p className="mt-1 text-gray-500">
-              {searchTerm ? "Try a different search term." : "Create a new ticket to get started."}
+              {searchTerm
+                ? "Try a different search term."
+                : "Create a new ticket to get started."}
             </p>
             {searchTerm && (
               <button
@@ -247,65 +257,90 @@ const TicketsListPage: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Ticket
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button 
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <button
                       onClick={() => toggleSort("status")}
                       className="flex items-center focus:outline-none"
                     >
                       Status
-                      {sortField === "status" && (
-                        sortDirection === "asc" ? 
-                        <FaSortAmountUp className="ml-1" /> : 
-                        <FaSortAmountDown className="ml-1" />
-                      )}
+                      {sortField === "status" &&
+                        (sortDirection === "asc" ? (
+                          <FaSortAmountUp className="ml-1" />
+                        ) : (
+                          <FaSortAmountDown className="ml-1" />
+                        ))}
                     </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button 
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <button
                       onClick={() => toggleSort("priority")}
                       className="flex items-center focus:outline-none"
                     >
                       Priority
-                      {sortField === "priority" && (
-                        sortDirection === "asc" ? 
-                        <FaSortAmountUp className="ml-1" /> : 
-                        <FaSortAmountDown className="ml-1" />
-                      )}
+                      {sortField === "priority" &&
+                        (sortDirection === "asc" ? (
+                          <FaSortAmountUp className="ml-1" />
+                        ) : (
+                          <FaSortAmountDown className="ml-1" />
+                        ))}
                     </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button 
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <button
                       onClick={() => toggleSort("createdAt")}
                       className="flex items-center focus:outline-none"
                     >
                       Created
-                      {sortField === "createdAt" && (
-                        sortDirection === "asc" ? 
-                        <FaSortAmountUp className="ml-1" /> : 
-                        <FaSortAmountDown className="ml-1" />
-                      )}
+                      {sortField === "createdAt" &&
+                        (sortDirection === "asc" ? (
+                          <FaSortAmountUp className="ml-1" />
+                        ) : (
+                          <FaSortAmountDown className="ml-1" />
+                        ))}
                     </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <button 
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <button
                       onClick={() => toggleSort("updatedAt")}
                       className="flex items-center focus:outline-none"
                     >
                       Updated
-                      {sortField === "updatedAt" && (
-                        sortDirection === "asc" ? 
-                        <FaSortAmountUp className="ml-1" /> : 
-                        <FaSortAmountDown className="ml-1" />
-                      )}
+                      {sortField === "updatedAt" &&
+                        (sortDirection === "asc" ? (
+                          <FaSortAmountUp className="ml-1" />
+                        ) : (
+                          <FaSortAmountDown className="ml-1" />
+                        ))}
                     </button>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Comments
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Actions
                   </th>
                 </tr>
@@ -315,20 +350,35 @@ const TicketsListPage: React.FC = () => {
                   <tr key={ticket._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div>
-                        <div className="font-medium text-gray-900">{ticket.title}</div>
+                        <Link
+                          to={`/tickets/${ticket._id}`}
+                          className="font-medium text-gray-900 hover:text-blue-600"
+                        >
+                          {ticket.title}
+                        </Link>
                         <div className="text-sm text-gray-500 truncate max-w-xs">
                           {ticket.description}
                         </div>
-                        <div className="text-xs text-gray-400 mt-1">{ticket._id}</div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {ticket._id}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(ticket.status)}`}>
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(
+                          ticket.status
+                        )}`}
+                      >
                         {ticket.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityBadgeClass(ticket.priority)}`}>
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPriorityBadgeClass(
+                          ticket.priority
+                        )}`}
+                      >
                         {ticket.priority}
                       </span>
                     </td>
@@ -343,13 +393,13 @@ const TicketsListPage: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => openCommentModal(ticket._id)}
+                        <Link
+                          to={`/tickets/${ticket._id}`}
                           className="text-blue-600 hover:text-blue-900 p-1.5 bg-blue-50 rounded-md"
-                          title="Add comment"
+                          title="View ticket details"
                         >
                           <FaComment size={16} />
-                        </button>
+                        </Link>
                         <button
                           onClick={() => handleEdit(ticket._id)}
                           className="text-green-600 hover:text-green-900 p-1.5 bg-green-50 rounded-md"
@@ -373,13 +423,13 @@ const TicketsListPage: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       {/* Edit Modal */}
       {isEditModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h2 className="text-lg font-bold mb-4">Edit Ticket</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -388,24 +438,31 @@ const TicketsListPage: React.FC = () => {
                 <input
                   type="text"
                   value={editValues.title}
-                  onChange={(e) => setEditValues({...editValues, title: e.target.value})}
+                  onChange={(e) =>
+                    setEditValues({ ...editValues, title: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Description
                 </label>
                 <textarea
                   value={editValues.description}
-                  onChange={(e) => setEditValues({...editValues, description: e.target.value})}
+                  onChange={(e) =>
+                    setEditValues({
+                      ...editValues,
+                      description: e.target.value,
+                    })
+                  }
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
-            
+
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setIsEditModalOpen(false)}
@@ -416,7 +473,11 @@ const TicketsListPage: React.FC = () => {
               <button
                 onClick={handleUpdateTicket}
                 className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 flex items-center"
-                disabled={updateTicketLoading || !editValues.title.trim() || !editValues.description.trim()}
+                disabled={
+                  updateTicketLoading ||
+                  !editValues.title.trim() ||
+                  !editValues.description.trim()
+                }
               >
                 {updateTicketLoading ? (
                   <>
@@ -431,17 +492,18 @@ const TicketsListPage: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h2 className="text-lg font-bold mb-4">Delete Ticket</h2>
             <p className="text-gray-700">
-              Are you sure you want to delete ticket <span className="font-medium">{selectedTicket._id}</span>?
-              This action cannot be undone.
+              Are you sure you want to delete ticket{" "}
+              <span className="font-medium">{selectedTicket._id}</span>? This
+              action cannot be undone.
             </p>
-            
+
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
@@ -467,31 +529,39 @@ const TicketsListPage: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       {/* Comment Modal */}
       {isCommentModalOpen && selectedTicket && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h2 className="text-lg font-bold mb-2">Add Comment</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Adding comment to ticket: {selectedTicket._id} - {selectedTicket.title}
+              Adding comment to ticket: {selectedTicket._id} -{" "}
+              {selectedTicket.title}
             </p>
-            
+
             {/* Previous comments */}
             {selectedTicket.comments && selectedTicket.comments.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">Previous comments:</h3>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Previous comments:
+                </h3>
                 <div className="max-h-40 overflow-y-auto space-y-2">
-                  {selectedTicket.comments.map(comment => (
-                    <div key={comment._id} className="bg-gray-50 p-3 rounded-md">
+                  {selectedTicket.comments.map((comment) => (
+                    <div
+                      key={comment._id}
+                      className="bg-gray-50 p-3 rounded-md"
+                    >
                       <p className="text-sm">{comment.text}</p>
-                      <p className="text-xs text-gray-500 mt-1">{formatDate(comment.createdAt)}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDate(comment.createdAt)}
+                      </p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-            
+
             <textarea
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
@@ -499,7 +569,7 @@ const TicketsListPage: React.FC = () => {
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            
+
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setIsCommentModalOpen(false)}

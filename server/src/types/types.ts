@@ -54,11 +54,12 @@ export enum Permissions {
 }
 
 export interface IUser extends Document {
+  _id: Types.ObjectId;
   firstName: string;
   lastName: string;
   email: string;
   emailVerified: boolean;
-  password: string;
+  password?: string;
   otp?: string;
   otpExpires?: Date;
   role: UserRole;
@@ -77,10 +78,8 @@ export interface IUser extends Document {
   isOtpValid: () => boolean;
 }
 
-// Add to your existing types file...
-
 export interface IComment {
-  _id: string;
+  _id: Types.ObjectId;
   text: string;
   createdBy: string | IUser;
   ticketId: string | ITicket;
@@ -91,6 +90,7 @@ export interface IComment {
   replies?: Array<string | IComment>;
 }
 export interface ITicket extends Document {
+  _id: Types.ObjectId;
   title: string;
   description: string;
   status: TicketStatus;

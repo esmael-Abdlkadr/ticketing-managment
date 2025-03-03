@@ -64,7 +64,7 @@ export const signup = asyncHandler(
     }
   }
 );
-// Fix for line 99 in authController.ts
+
 export const verifyOtp = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email: rawEmail, otp } = req.body;
@@ -96,8 +96,10 @@ export const verifyOtp = asyncHandler(
       // Save the user
       await user.save({ validateBeforeSave: false });
 
-      // Remove sensitive data - fixed type issue
-      const userData: Partial<typeof user> = user.toObject();
+      // Simplify this approach - just convert to a plain object
+      const userData = user.toObject();
+
+      // Delete sensitive fields
       delete userData.password;
       delete userData.otp;
       delete userData.otpExpires;
@@ -174,6 +176,9 @@ export const login = asyncHandler(
     if (!user) {
       return next(new HttpError("Invalid email or password", 401));
     }
+    if (!user.password) {
+      return next(new HttpError("Invalid email or password", 401));
+    }
     const isPasswordMatch = await user.comparePassword(password, user.password);
     if (!isPasswordMatch) {
       return next(new HttpError("Invalid email or password", 401));
@@ -182,7 +187,7 @@ export const login = asyncHandler(
       return next(new HttpError("Please verify your email to login", 401));
     }
     const accessToken = generateAccessToken({
-      id: user._id as string | number,
+      id: user._id as unknown as string | number,
     });
     const { password: _, __v, ...rest } = user.toObject();
 
@@ -211,7 +216,7 @@ export const resetPassword = asyncHandler(
     // user.passwordResetExpires = undefined;
     await user.save();
     const accessToken = generateAccessToken({
-      id: user._id as string | number,
+      id: user._id as unknown as string | number,
     });
     res.status(200).json({
       status: "success",

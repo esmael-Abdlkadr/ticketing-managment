@@ -96,8 +96,7 @@ export const inviteUser = asyncHandler(
       return next(new HttpError(errorMessages, 400));
     }
 
-    const { firstName, lastName, email, role } =
-      parsedResult.data;
+    const { firstName, lastName, email, role } = parsedResult.data;
 
     try {
       // Check if user already exists
@@ -156,26 +155,26 @@ export const inviteUser = asyncHandler(
 export const completeRegistration = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const { token, password } = req.body;
-  
+
     if (!token || !password) {
       return next(new HttpError("Token and password are required", 400));
     }
 
     // MODIFIED: Include select:false fields explicitly with + prefix
-    const user = await User.findOne({ inviteToken: token })
-      .select('+inviteToken +inviteExpires');
-    
+    const user = await User.findOne({ inviteToken: token }).select(
+      "+inviteToken +inviteExpires"
+    );
+
     if (!user) {
       console.log("No user found with the provided token");
       return next(new HttpError("Invalid invitation token", 400));
     }
-    
+
     // If user exists, check if token is expired
     if (!user.inviteExpires || user.inviteExpires < new Date()) {
       return next(new HttpError("Invitation token has expired", 400));
     }
 
-    
     // Set user's password and activate account
     user.password = password;
     user.emailVerified = true;
@@ -187,7 +186,7 @@ export const completeRegistration = asyncHandler(
 
     // Generate access token for immediate login
     const accessToken = generateAccessToken({
-      id: user._id as string | number,
+      id: user._id.toString(),
     });
 
     res.status(200).json({
