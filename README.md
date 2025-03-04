@@ -1,8 +1,4 @@
-# SupportSphere - Ticket Management System
-
-![SupportSphere Logo](https://via.placeholder.com/500x150?text=SupportSphere)
-
-> Last updated: 2025-03-04 21:16:17 UTC by esmael-Abdlkadr
+# Ticket Management System
 
 ## 📋 Overview
 
