@@ -10,7 +10,7 @@ SupportSphere is a comprehensive ticket management system designed to streamline
 - **Admin Dashboard** - Where support staff manage and resolve tickets
 - **Backend API** - Handles data processing, authentication, and email notifications
 
-**Live Demo**: [https://ticket-client.vercel.app](https://ticket-client.vercel.app)
+**Live Demo**: [https://ticket-client.vercel.app](https://ticketing-delta-eight.vercel.app)
 
 ## ✨ Features
 
