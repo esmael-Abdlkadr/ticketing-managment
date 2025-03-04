@@ -22,7 +22,7 @@ const swaggerDefinition = {
   ],
   servers: [
     {
-      url: "http://localhost:5000",
+      url: "https://ticket-server-production-d4c5.up.railway.app",
     },
   ],
 };

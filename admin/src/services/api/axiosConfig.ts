@@ -1,7 +1,8 @@
 import axios from "axios";
+import API_URL from "../../config/api";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_API_URL,
+  baseURL: API_URL,
   headers: {
     "Cache-Control": "no-cache",
     Pragma: "no-cache",

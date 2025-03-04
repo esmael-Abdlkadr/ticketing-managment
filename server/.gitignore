@@ -6,3 +6,4 @@ dist
 logs
 # Sentry Config File
 .sentryclirc
+.env

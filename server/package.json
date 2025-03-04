@@ -3,15 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  {
-    "scripts": {
-      "dev": "ts-node-dev --respawn --transpile-only server.ts",
-      "start": "node dist/server.js",
-      "build": "tsc",
-      "build:prod": "tsc && (pnpm sentry:sourcemaps || echo 'Skipping Sentry sourcemaps')",
-      "sentry-wizard": "sentry-wizard -i sourcemaps --saas",
-      "sentry:sourcemaps": "npx sentry-cli sourcemaps inject --org anonshare --project anonshare-api ./dist && npx sentry-cli sourcemaps upload --org anonshare --project anonshare-api ./dist"
-    }
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "build:prod": "tsc && (pnpm sentry:sourcemaps || echo 'Skipping Sentry sourcemaps')",
+    "sentry-wizard": "sentry-wizard -i sourcemaps --saas",
+    "sentry:sourcemaps": "npx sentry-cli sourcemaps inject --org anonshare --project anonshare-api ./dist && npx sentry-cli sourcemaps upload --org anonshare --project anonshare-api ./dist"
   },
   "keywords": [],
   "author": "",
@@ -31,8 +29,10 @@
     "@types/swagger-ui-express": "^4.1.8",
     "bcryptjs": "^3.0.2",
     "compression": "^1.8.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
+    "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
